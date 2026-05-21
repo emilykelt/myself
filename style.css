@@ -41,9 +41,13 @@ body {
   padding: clamp(2.5rem, 8vw, 6rem) clamp(1.5rem, 6vw, 4rem);
 }
 
-/* the ink — applied once to the whole page so the SVG filter runs
-   in a single pass instead of per element (much cheaper on scroll) */
-.page {
+/* the ink — applied to text containers (not the whole .page) so the
+   filter leaves the polaroid photo alone. One filter pass per container
+   is still much cheaper than one per text element. */
+.intro-text,
+.page h2,
+.page .list,
+.page .footer {
   filter: url(#ink);
 }
 
@@ -71,6 +75,51 @@ h1 {
   font-size: clamp(1.2rem, 2.6vw, 1.5rem);
   line-height: 1.4;
   transform: rotate(-0.3deg);
+}
+
+.intro {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.intro-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.polaroid {
+  flex: 0 0 auto;
+  margin: 0.5rem 0 0;
+  padding: 0.55rem 0.55rem 1.6rem;
+  background: #fafaf6;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 8px 18px -6px rgba(0, 0, 0, 0.35),
+    0 3px 6px -2px rgba(0, 0, 0, 0.25);
+  transform: rotate(3.5deg);
+  width: clamp(140px, 22vw, 200px);
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(0.15) contrast(1.05);
+}
+
+@media (max-width: 540px) {
+  .intro {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .polaroid {
+    width: 55%;
+    max-width: 220px;
+  }
 }
 
 h2 {
