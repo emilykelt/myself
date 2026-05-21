@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Emily Kelt</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ink texture filter:
+         1) displace glyph edges so strokes look rough
+         2) multiply the alpha by a noise field so density pools / thins like real ink -->
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <filter id="ink">
+        <!-- 1) rough edges -->
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.9"
+          numOctaves="2"
+          seed="4"
+          result="edgeNoise"
+        />
+        <feDisplacementMap
+          in="SourceGraphic"
+          in2="edgeNoise"
+          scale="1.4"
+          xChannelSelector="R"
+          yChannelSelector="G"
+          result="rough"
+        />
+
+        <!-- 2) a washed-out, lighter-blue version of the same text;
+                 forms the base layer so thinner ink reads as paler blue -->
+        <feColorMatrix
+          in="rough"
+          type="matrix"
+          values="0.55 0.30 0.30 0 0.30
+                  0.30 0.55 0.30 0 0.30
+                  0.30 0.30 0.85 0 0.10
+                  0    0    0    1 0"
+          result="roughLight"
+        />
+
+        <!-- 3) density noise → alpha mask: where strong, ink pools dark;
+                 where weak, only the lighter base shows through -->
+        <feTurbulence
+          type="fractalNoise"
+          baseFrequency="0.04 0.08"
+          numOctaves="2"
+          seed="11"
+          result="densityNoise"
+        />
+        <feComponentTransfer in="densityNoise" result="densityMask">
+          <feFuncA type="table" tableValues="0 0.6 1 0.4 1 0.2 0.9" />
+        </feComponentTransfer>
+
+        <feComposite
+          in="rough"
+          in2="densityMask"
+          operator="in"
+          result="darkInked"
+        />
+
+        <!-- 4) very faint bleed under the strokes (reduced) -->
+        <feGaussianBlur in="rough" stdDeviation="0.15" result="bleed" />
+        <feComponentTransfer in="bleed" result="bleedFaint">
+          <feFuncA type="linear" slope="0.12" />
+        </feComponentTransfer>
+
+        <!-- 5) darker edge ring: erode the rough text and subtract from
+                 itself so only a thin outline remains, then dye it deep -->
+        <feMorphology
+          in="rough"
+          operator="erode"
+          radius="0.5"
+          result="inner"
+        />
+        <feComposite
+          in="rough"
+          in2="inner"
+          operator="out"
+          result="edgeOnly"
+        />
+        <feColorMatrix
+          in="edgeOnly"
+          type="matrix"
+          values="0.15 0    0    0 0
+                  0    0.15 0    0 0
+                  0    0    0.35 0 0
+                  0    0    0    0.85 0"
+          result="edgeDark"
+        />
+
+        <feMerge>
+          <feMergeNode in="bleedFaint" />
+          <feMergeNode in="roughLight" />
+          <feMergeNode in="darkInked" />
+          <feMergeNode in="edgeDark" />
+        </feMerge>
+      </filter>
+    </svg>
+
+    <main class="page">
+      <h1>emily kelt</h1>
+      <p class="lede">
+        second-year computer science at pembroke, cambridge university.<br />
+        from edinburgh.
+      </p>
+
+      <h2>things i've done</h2>
+      <ol class="list">
+        <li>
+          <span class="num">1)</span>
+          <span class="item">
+            built &amp; sold a medical data visualisation tool (flask,
+            postgres, aws) to gp clinics — summer '24
+          </span>
+        </li>
+        <li>
+          <span class="num">2)</span>
+          <span class="item">
+            led an 8-person cansat space team in high school — NIR camera
+            for plant health, then live 3d modelling from IMU data
+            (2022–24)
+          </span>
+        </li>
+        <li>
+          <span class="num">3)</span>
+          <span class="item">
+            interned at autodesk on CAD features in C++ &amp; react
+            (summer '25)
+          </span>
+        </li>
+        <li>
+          <span class="num">4)</span>
+          <span class="item">
+            won 3 tracks (SIG, google deepmind, lovable) and £52k at
+            hackeurope paris, europe's largest hackathon (feb '26)
+          </span>
+        </li>
+        <li>
+          <span class="num">5)</span>
+          <span class="item">
+            designed an interactive workbook on exam stress for
+            edinburgh uni's psych dept (summer '24)
+          </span>
+        </li>
+        <li>
+          <span class="num">6)</span>
+          <span class="item">
+            presented a
+            <a href="https://emilykelt.github.io/simulating-patients/"
+              >poster on simulating patients to evaluate medical
+              LLMs</a
+            >
+            at the oxbridge women in CS conference (spring '26)
+          </span>
+        </li>
+        <li>
+          <span class="num">7)</span>
+          <span class="item">
+            built
+            <a href="https://whats-for-trough.vercel.app"
+              >what's for trough</a
+            >, visited by hundreds of students daily
+          </span>
+        </li>
+      </ol>
+
+      <h2>what's next</h2>
+      <ol class="list">
+        <li>
+          <span class="num">1)</span>
+          <span class="item">building a startup</span>
+        </li>
+        <li>
+          <span class="num">2)</span>
+          <span class="item"
+            >SWE intern at
+            <a href="https://www.bamfunds.com">BAM</a> this summer</span
+          >
+        </li>
+        <li>
+          <span class="num">3)</span>
+          <span class="item">
+            YC startup school in july &amp; exploring fellowships
+          </span>
+        </li>
+      </ol>
+
+      <h2>also</h2>
+      <ul class="list bullets">
+        <li>
+          <span class="num">·</span>
+          <span class="item">
+            year rep for the CS cohort; publicity &amp; socials for
+            CUCaTS
+          </span>
+        </li>
+        <li>
+          <span class="num">·</span>
+          <span class="item">
+            UKMT senior gold · einstein mad-hat runner-up · IOP eurekas
+            runner-up · bebras distinction · scottish gov climate
+            writing comp winner
+          </span>
+        </li>
+        <li>
+          <span class="num">·</span>
+          <span class="item">
+            vegetarian, two ragdoll cats (cookie &amp; smudge)
+          </span>
+        </li>
+      </ul>
+
+      <p class="footer">
+        emk50 @ cam ·
+        <a href="https://github.com/emilykelt">github</a> ·
+        <a href="https://www.linkedin.com/in/emily-kelt-801697256"
+          >linkedin</a
+        >
+        · last scribbled may '26
+      </p>
+    </main>
+  </body>
+</html>
